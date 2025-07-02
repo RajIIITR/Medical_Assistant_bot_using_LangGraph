@@ -52,7 +52,7 @@ def format_docs(docs):
 def create_rag_chain(llm):
     """Create RAG chain."""
     retriever = get_retriever()
-    prompt = hub.pull("rlm/rag-prompt")
+    prompt = get_prompt()  
     
     rag_chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}
@@ -140,11 +140,23 @@ def web_search(state):
 
     return {"documents": documents, "question": question}
 
-def generate(state, rag_chain):
-    """Generate answer using RAG chain."""
+def generate(state, llm, prompt):
+    """
+    Generate answer using both RAG documents and web search results
+
+    Args:
+        state (dict): The current graph state with 'question' and 'documents'
+        llm: The language model instance
+        prompt: The RAG prompt template
+    
+    Returns:
+        state (dict): Updated state with 'generation' added
+    """
+    print("---GENERATE---")
+
     question = state["question"]
     documents = state["documents"]
-    
+
     # Check if documents is None or empty
     if documents is None or len(documents) == 0:
         # If there's already a generation (from reject), return it
@@ -160,14 +172,33 @@ def generate(state, rag_chain):
                 "documents": documents,
                 "generation": "Error: No documents were retrieved before generation."
             }
-        
-    generation = rag_chain.invoke(question)
+
+    # Format documents from state (includes both RAG and web search results)
+    formatted_context = format_docs(documents)
+    
+    # Create a chain that uses the documents from state instead of retriever
+    generation_chain = (
+        prompt
+        | llm
+        | StrOutputParser()
+    )
+    
+    # Generate answer using both RAG and web search context
+    generation = generation_chain.invoke({
+        "context": formatted_context,
+        "question": question
+    })
+
+    print(f"---USING CONTEXT FROM {len(documents)} DOCUMENTS---")
     
     return {
         "documents": documents,
         "generation": generation,
         "question": question
     }
+def get_prompt():
+    """Get the RAG prompt for generation."""
+    return hub.pull("rlm/rag-prompt")
 
 def transform_question(state, question_rewriter):
     """Transform the query to produce a better question."""
@@ -186,6 +217,7 @@ def create_workflow(llm):
     rag_chain = create_rag_chain(llm)
     retrieval_grader = create_question_grader(llm)
     question_rewriter = create_question_rewriter(llm)
+    prompt = get_prompt()  # ADD THIS LINE
     
     # Create workflow
     workflow = StateGraph(State)
@@ -193,7 +225,7 @@ def create_workflow(llm):
     # Define nodes with closures to pass dependencies
     workflow.add_node("retrieve", retrieve)
     workflow.add_node("grade_question", lambda state: grade_question(state, retrieval_grader))
-    workflow.add_node("generate", lambda state: generate(state, rag_chain))
+    workflow.add_node("generate", lambda state: generate(state, llm, prompt))  # MODIFY THIS LINE
     workflow.add_node("transform_question", lambda state: transform_question(state, question_rewriter))
     workflow.add_node("web_search_node", lambda state: web_search(state, )) # web_search
     workflow.add_node("reject", reject_question)
