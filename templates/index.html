@@ -3,35 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Chatbot with LangGraph</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Medical Bot - AI Medical Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>🏥 Medical Chatbot</h1>
-            <p>Powered by LangGraph AI Workflow</p>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot-message">
-                <div class="message-content">
-                    <strong>🤖 Medical Bot:</strong> Hello! I'm here to help with your medical questions. Ask me anything related to health, symptoms, treatments, or general medical information.
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-stethoscope"></i>
+                    <h1>Medical Bot</h1>
+                </div>
+                <p class="subtitle">AI-Powered Medical Assistant with Image Analysis</p>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <i class="fas fa-robot message-icon"></i>
+                        <div class="message-text">
+                            <p>Hello! I'm your AI Medical Assistant. I can help you with:</p>
+                            <ul>
+                                <li>Medical questions and symptoms</li>
+                                <li>Analysis of medical images</li>
+                                <li>General health information</li>
+                            </ul>
+                            <p>You can send me text questions or upload medical images for analysis.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="chat-input-container">
-            <div class="input-group">
-                <input type="text" id="messageInput" placeholder="Ask your medical question..." autocomplete="off">
-                <button id="sendButton" onclick="sendMessage()">
-                    <span id="buttonText">Send</span>
-                    <div id="loadingSpinner" class="spinner hidden"></div>
-                </button>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <form id="chatForm" enctype="multipart/form-data">
+                    <div class="input-container">
+                        <div class="text-input-wrapper">
+                            <textarea 
+                                id="messageInput" 
+                                name="message"
+                                placeholder="Ask your medical question here..."
+                                rows="1"
+                                required
+                            ></textarea>
+                        </div>
+                        
+                        <div class="file-input-wrapper">
+                            <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;">
+                            <button type="button" id="imageButton" class="image-btn" title="Upload Image">
+                                <i class="fas fa-image"></i>
+                            </button>
+                        </div>
+                        
+                        <button type="submit" id="sendButton" class="send-btn" title="Send Message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="imagePreview" class="image-preview" style="display: none;">
+                        <div class="preview-container">
+                            <img id="previewImg" src="" alt="Preview">
+                            <button type="button" id="removeImage" class="remove-image">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <p class="preview-text">Image selected for analysis</p>
+                    </div>
+                </form>
             </div>
         </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Processing your request...</p>
+        </div>
     </div>
-    
-    <script src="/static/script.js"></script>
+
+    <script src="{{ url_for('static', path='/script.js') }}"></script>
 </body>
 </html>

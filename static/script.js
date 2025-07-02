@@ -1,168 +1,292 @@
-// Chat functionality
-let isProcessing = false;
-
-// DOM elements
+// DOM Elements
+const chatForm = document.getElementById('chatForm');
 const messageInput = document.getElementById('messageInput');
+const imageInput = document.getElementById('imageInput');
+const imageButton = document.getElementById('imageButton');
 const sendButton = document.getElementById('sendButton');
 const chatMessages = document.getElementById('chatMessages');
-const buttonText = document.getElementById('buttonText');
-const loadingSpinner = document.getElementById('loadingSpinner');
+const imagePreview = document.getElementById('imagePreview');
+const previewImg = document.getElementById('previewImg');
+const removeImageBtn = document.getElementById('removeImage');
+const loadingIndicator = document.getElementById('loadingIndicator');
 
-// Event listeners
-messageInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter' && !isProcessing) {
-        sendMessage();
-    }
+// State variables
+let selectedImage = null;
+let isProcessing = false;
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    initializeEventListeners();
+    adjustTextareaHeight();
 });
 
-// Prevent form submission on Enter
-messageInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-    }
-});
+function initializeEventListeners() {
+    // Form submission
+    chatForm.addEventListener('submit', handleFormSubmit);
+    
+    // Image button click
+    imageButton.addEventListener('click', () => {
+        imageInput.click();
+    });
+    
+    // Image input change
+    imageInput.addEventListener('change', handleImageSelect);
+    
+    // Remove image button
+    removeImageBtn.addEventListener('click', removeImage);
+    
+    // Textarea auto-resize
+    messageInput.addEventListener('input', adjustTextareaHeight);
+    
+    // Enter key handling (Ctrl+Enter or Shift+Enter to send)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.shiftKey)) {
+            e.preventDefault();
+            if (!isProcessing && messageInput.value.trim()) {
+                handleFormSubmit(e);
+            }
+        }
+    });
+}
 
-// Auto-resize input based on content
-messageInput.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-});
-
-async function sendMessage() {
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    if (isProcessing) return;
+    
     const message = messageInput.value.trim();
-    
-    if (!message || isProcessing) {
-        return;
-    }
-    
-    // Set processing state
-    isProcessing = true;
-    setButtonLoading(true);
+    if (!message) return;
     
     // Add user message to chat
-    addMessage(message, 'user');
+    addMessage(message, 'user', selectedImage);
     
-    // Clear input
+    // Clear input and image
     messageInput.value = '';
-    messageInput.style.height = 'auto';
+    const imageToSend = selectedImage;
+    removeImage();
+    adjustTextareaHeight();
+    
+    // Show loading
+    setProcessing(true);
     
     try {
-        // Send request to backend
-        console.log('Sending message:', message);
+        let response;
         
-        const response = await fetch('/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message: message })
-        });
-        
-        console.log('Response status:', response.status);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Response error:', errorText);
-            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        if (imageToSend) {
+            // Send to image endpoint if image is present
+            response = await sendImageMessage(message, imageToSend);
+        } else {
+            // Send to text endpoint if no image
+            response = await sendTextMessage(message);
         }
         
-        const data = await response.json();
-        console.log('Response data:', data);
-        
         // Add bot response to chat
-        addMessage(data.answer, 'bot');
+        addMessage(response.answer, 'bot');
         
     } catch (error) {
         console.error('Error:', error);
-        
-        // Add error message to chat
-        const errorMessage = `❌ Sorry, I encountered an error: ${error.message}. Please try again.`;
-        addMessage(errorMessage, 'bot', true);
+        addMessage('Sorry, I encountered an error while processing your request. Please try again.', 'bot');
     } finally {
-        // Reset processing state
-        isProcessing = false;
-        setButtonLoading(false);
-        messageInput.focus();
+        setProcessing(false);
     }
 }
 
-function addMessage(content, sender, isError = false) {
+async function sendTextMessage(message) {
+    const response = await fetch('/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message })
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+}
+
+async function sendImageMessage(message, imageFile) {
+    const formData = new FormData();
+    formData.append('message', message);
+    formData.append('image', imageFile);
+    
+    const response = await fetch('/chat/mixed', {
+        method: 'POST',
+        body: formData
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+}
+
+function handleImageSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file.');
+        return;
+    }
+    
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+        alert('Image file is too large. Please select an image smaller than 10MB.');
+        return;
+    }
+    
+    selectedImage = file;
+    showImagePreview(file);
+}
+
+function showImagePreview(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        imagePreview.style.display = 'block';
+        imageButton.classList.add('has-image');
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeImage() {
+    selectedImage = null;
+    imagePreview.style.display = 'none';
+    imageButton.classList.remove('has-image');
+    imageInput.value = '';
+}
+
+function addMessage(text, sender, image = null) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}-message${isError ? ' error-message' : ''}`;
+    messageDiv.className = `message ${sender}-message`;
     
     const messageContent = document.createElement('div');
     messageContent.className = 'message-content';
     
-    if (sender === 'bot') {
-        messageContent.innerHTML = `<strong>🤖 Medical Bot:</strong><br><br>${formatMessage(content)}`;
-    } else {
-        messageContent.innerHTML = `<strong>👤 You:</strong><br><br>${formatMessage(content)}`;
+    const icon = document.createElement('i');
+    icon.className = `fas ${sender === 'user' ? 'fa-user' : 'fa-robot'} message-icon`;
+    
+    const messageText = document.createElement('div');
+    messageText.className = 'message-text';
+    
+    // Format the text content
+    if (typeof text === 'string') {
+        // Convert line breaks to paragraphs
+        const paragraphs = text.split('\n').filter(p => p.trim());
+        if (paragraphs.length > 1) {
+            paragraphs.forEach(paragraph => {
+                const p = document.createElement('p');
+                p.textContent = paragraph.trim();
+                messageText.appendChild(p);
+            });
+        } else {
+            const p = document.createElement('p');
+            p.textContent = text;
+            messageText.appendChild(p);
+        }
     }
     
+    // Add image if present (for user messages)
+    if (image && sender === 'user') {
+        const imageElement = document.createElement('img');
+        imageElement.className = 'message-image';
+        imageElement.src = URL.createObjectURL(image);
+        imageElement.alt = 'Uploaded image';
+        messageText.appendChild(imageElement);
+    }
+    
+    messageContent.appendChild(icon);
+    messageContent.appendChild(messageText);
     messageDiv.appendChild(messageContent);
+    
     chatMessages.appendChild(messageDiv);
     
     // Scroll to bottom
+    scrollToBottom();
+}
+
+function adjustTextareaHeight() {
+    messageInput.style.height = 'auto';
+    const newHeight = Math.min(messageInput.scrollHeight, 120);
+    messageInput.style.height = newHeight + 'px';
+}
+
+function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    
-    // Add animation
-    messageDiv.style.opacity = '0';
-    messageDiv.style.transform = 'translateY(20px)';
-    
-    requestAnimationFrame(() => {
-        messageDiv.style.transition = 'all 0.3s ease-out';
-        messageDiv.style.opacity = '1';
-        messageDiv.style.transform = 'translateY(0)';
-    });
 }
 
-function formatMessage(message) {
-    // Convert newlines to <br> tags
-    return message
-        .replace(/\n\n/g, '<br><br>')
-        .replace(/\n/g, '<br>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>');
-}
-
-function setButtonLoading(loading) {
-    if (loading) {
-        buttonText.classList.add('hidden');
-        loadingSpinner.classList.remove('hidden');
-        sendButton.disabled = true;
-        sendButton.style.cursor = 'not-allowed';
+function setProcessing(processing) {
+    isProcessing = processing;
+    sendButton.disabled = processing;
+    
+    if (processing) {
+        loadingIndicator.style.display = 'block';
+        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     } else {
-        buttonText.classList.remove('hidden');
-        loadingSpinner.classList.add('hidden');
-        sendButton.disabled = false;
-        sendButton.style.cursor = 'pointer';
+        loadingIndicator.style.display = 'none';
+        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
 }
 
-// Initialize chat
-document.addEventListener('DOMContentLoaded', function() {
-    messageInput.focus();
-    console.log('Chat interface initialized');
+// Utility function to format bot responses
+function formatBotResponse(text) {
+    // Handle lists, bold text, etc.
+    let formatted = text;
     
-    // Add a small delay to ensure the page is fully loaded
-    setTimeout(() => {
-        console.log('Page fully loaded, ready for interactions');
-    }, 100);
+    // Convert **bold** to <strong>
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert *italic* to <em>
+    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Convert numbered lists
+    formatted = formatted.replace(/^\d+\.\s(.*)$/gm, '<li>$1</li>');
+    
+    // Convert bullet points
+    formatted = formatted.replace(/^[-•]\s(.*)$/gm, '<li>$1</li>');
+    
+    return formatted;
+}
+
+// Handle drag and drop for images
+chatMessages.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    chatMessages.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
 });
 
-// Handle window focus
-window.addEventListener('focus', function() {
-    if (!isProcessing) {
-        messageInput.focus();
+chatMessages.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    chatMessages.style.backgroundColor = '';
+});
+
+chatMessages.addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    chatMessages.style.backgroundColor = '';
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        if (file.type.startsWith('image/')) {
+            selectedImage = file;
+            showImagePreview(file);
+        }
     }
 });
 
-// Error handling for uncaught errors
-window.addEventListener('error', function(e) {
-    console.error('Global error:', e.error);
+// Prevent default drag behaviors
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    document.addEventListener(eventName, preventDefaults, false);
 });
 
-// Handle unhandled promise rejections
-window.addEventListener('unhandledrejection', function(e) {
-    console.error('Unhandled promise rejection:', e.reason);
-});
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}

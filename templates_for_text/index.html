@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Chatbot with LangGraph</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🏥 Medical Chatbot</h1>
+            <p>Powered by LangGraph AI Workflow</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <strong>🤖 Medical Bot:</strong> Hello! I'm here to help with your medical questions. Ask me anything related to health, symptoms, treatments, or general medical information.
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="input-group">
+                <input type="text" id="messageInput" placeholder="Ask your medical question..." autocomplete="off">
+                <button id="sendButton" onclick="sendMessage()">
+                    <span id="buttonText">Send</span>
+                    <div id="loadingSpinner" class="spinner hidden"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>
