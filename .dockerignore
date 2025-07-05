@@ -1,0 +1,8 @@
+.github/*
+Data/*
+research/*
+static_for_text/*
+templates_for_text/*
+for_text_app.py
+store.py
+__pycache__/*
