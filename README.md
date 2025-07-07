@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 ```ini
 PINECONE_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-OPENAI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+GOOGLE_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 
@@ -53,7 +53,7 @@ open up localhost:
 ### Techstack Used:
 
 - Python
-- LangChain
-- Flask
-- GPT
+- LangGraph
+- FastAPI
+- Google-Gemini
 - Pinecone
