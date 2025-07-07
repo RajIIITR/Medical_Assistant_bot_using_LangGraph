@@ -45,3 +45,92 @@ flowchart TD
     F --> H[__end__]
 
 
+### 🖼️ Image + Text Query Pipeline
+
+```mermaid
+flowchart TD
+    A[__start__] --> B[grade_image]
+    B -->|valid| C[Get_Image_Info] --> D[transform_question] --> E[web_search_node] --> F[generate]
+    B -->|invalid| G[reject] --> F
+    F --> H[__end__]
+
+
+MedQueryAI/
+├── app.py
+├── static/
+│   ├── script.js               
+│   ├── style.css
+├── templates/
+│   ├── index.html
+├── research/
+│   ├── trial_image.ipynb             # Prototyping code for Image
+│   ├── trial_text.ipynb              # Prototyping code for text
+├── src/
+│   ├── helper_text.py                # text-analysis workflow code
+│   ├── helper_image.py               # image+text analysis workflow code
+├── Dockerfile
+├── requirements.txt
+├── .github/
+│   └── workflows/
+│                └── cicd.yaml        # GitHub Actions configs
+├── .env
+├── .gitignore                   
+├── .dockerignore
+├── store.py                          # Used to create pinecone index
+└── README.md
+
+
+
+
+
+🚀 Deployment Guide
+✅ Local Development
+Clone the repository
+Run the following command in your terminal:
+
+git clone https://github.com/yourusername/MedQueryAI.git
+
+cd MedQueryAI
+
+Install Python dependencies
+Use pip to install all required packages:
+
+pip install -r requirements.txt
+
+Set up environment variables
+Create a .env file in the root directory with the following content:
+
+PINECONE_API_KEY=your_key
+
+TAVILY_API_KEY=your_key
+
+GEMINI_API_KEY=your_key
+
+Start the development server
+Launch the FastAPI app locally:
+
+uvicorn app.main:app --reload
+
+Access the application
+
+Open your browser and go to: http://localhost:8000
+
+Swagger UI (API docs) is available at: http://localhost:8000/docs
+
+🐳 Docker Deployment
+Build the Docker image
+From the root of the project, run:
+
+docker build -t medqueryai .
+
+Run the container with environment variables
+Make sure you have a .env file, then start the container:
+
+docker run -p 8000:8000 --env-file .env medqueryai
+
+Verify the deployment
+
+Visit http://localhost:8000 in your browser
+
+Access the API docs at: http://localhost:8000/docs
+
