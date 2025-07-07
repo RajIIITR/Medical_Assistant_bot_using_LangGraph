@@ -83,54 +83,84 @@ MedQueryAI/
 
 
 
-🚀 Deployment Guide
-✅ Local Development
-Clone the repository
-Run the following command in your terminal:
+## 🚀 Deployment Guide
 
-git clone https://github.com/yourusername/MedQueryAI.git
+### ✅ Local Development
 
-cd MedQueryAI
+To run the project locally:
 
-Install Python dependencies
-Use pip to install all required packages:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/MedQueryAI.git
+   cd MedQueryAI
+   ```
 
-pip install -r requirements.txt
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Set up environment variables
-Create a .env file in the root directory with the following content:
+3. **Set up environment variables**
 
-PINECONE_API_KEY=your_key
+   Create a `.env` file in the root directory with the following:
+   ```env
+   PINECONE_API_KEY=your_pinecone_api_key
+   TAVILY_API_KEY=your_tavily_api_key
+   GEMINI_API_KEY=your_gemini_api_key
+   ```
 
-TAVILY_API_KEY=your_key
+4. **Start the FastAPI server**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
-GEMINI_API_KEY=your_key
+5. **Open in browser**
+   - App URL: http://localhost:8080
 
-Start the development server
-Launch the FastAPI app locally:
+---
 
-uvicorn app.main:app --reload
+### 🐳 Docker Deployment
 
-Access the application
+1. **Build the Docker image**
+   ```bash
+   docker build -t medqueryai .
+   ```
 
-Open your browser and go to: http://localhost:8000
+2. **Run the Docker container**
+   ```bash
+   docker run -p 8888:8080 abhishekraj07/medqueryai
+   ```
 
-Swagger UI (API docs) is available at: http://localhost:8000/docs
+> ✅ Ensure your `.env` file is present in the root directory before running the container.
 
-🐳 Docker Deployment
-Build the Docker image
-From the root of the project, run:
+---
 
-docker build -t medqueryai .
+### ⚙️ CI/CD with GitHub Actions
 
-Run the container with environment variables
-Make sure you have a .env file, then start the container:
+This project uses GitHub Actions for automated testing and deployment.
 
-docker run -p 8000:8000 --env-file .env medqueryai
+1. **Workflow file**
+   ```
+   .github/workflows/cicd.yaml
+   ```
 
-Verify the deployment
+2. **Pipeline includes:**
+   - Checkout source code
+   - Set up Python environment
+   - Install dependencies
+   - Build and push Docker image (if configured)
+   - Deploy to cloud (e.g., AWS EC2/ECS)
 
-Visit http://localhost:8000 in your browser
+3. **Secrets to set in GitHub**
+   Go to: **Repository > Settings > Secrets and variables > Actions**, and add:
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `PINECONE_API_KEY`
+   - `TAVILY_API_KEY`
+   - `GEMINI_API_KEY`
+   - `DOCKERHUB_USERNAME` (if pushing to Docker Hub)
+   - `DOCKERHUB_TOKEN`
 
-Access the API docs at: http://localhost:8000/docs
-
+4. **Triggering**
+   - Automatically on `push` to `main`
+   - Or manually via GitHub → Actions → Run workflow
