@@ -33,26 +33,35 @@ MedQueryAI is a multi-modal medical AI system designed to deliver accurate and i
    - A context-rich response is generated using Google Gemini 2.5 Flash
    - The response is returned via the `generate` node
 
-## 📊 Workflow Diagrams
+## 🧭 Workflow Diagrams
 
 ### 🔤 Text-Only Query Pipeline
 
 ```mermaid
 flowchart TD
-    A[__start__] --> B[grade_question]
-    B -->|valid| C[retrieve] --> D[transform_question] --> E[web_search_node] --> F[generate]
-    B -->|invalid| G[reject] --> F
-    F --> H[__end__]
-
+    A([start]) --> B{grade_question}
+    B -- valid --> C[retrieve]
+    C --> D[transform_question]
+    D --> E[web_search_node]
+    E --> F[generate]
+    B -- invalid --> G[reject]
+    G --> F
+    F --> H([end])
+```
 
 ### 🖼️ Image + Text Query Pipeline
 
 ```mermaid
 flowchart TD
-    A[__start__] --> B[grade_image]
-    B -->|valid| C[Get_Image_Info] --> D[transform_question] --> E[web_search_node] --> F[generate]
-    B -->|invalid| G[reject] --> F
-    F --> H[__end__]
+    A([start]) --> B{grade_image}
+    B -- valid --> C[Get_Image_Info]
+    C --> D[transform_question]
+    D --> E[web_search_node]
+    E --> F[generate]
+    B -- invalid --> G[reject]
+    G --> F
+    F --> H([end])
+```
 
 
 MedQueryAI/
