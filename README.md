@@ -67,29 +67,34 @@ flowchart TD
 
 
 
+## 📂 Project Structure
+
+```plaintext
 MedQueryAI/
 ├── app.py
 ├── static/
 │   ├── script.js               
-│   ├── style.css
+│   └── style.css
 ├── templates/
-│   ├── index.html
+│   └── index.html
 ├── research/
 │   ├── trial_image.ipynb             # Prototyping code for Image
-│   ├── trial_text.ipynb              # Prototyping code for text
+│   └── trial_text.ipynb              # Prototyping code for text
 ├── src/
 │   ├── helper_text.py                # text-analysis workflow code
-│   ├── helper_image.py               # image+text analysis workflow code
+│   └── helper_image.py               # image+text analysis workflow code
 ├── Dockerfile
 ├── requirements.txt
 ├── .github/
 │   └── workflows/
-│                └── cicd.yaml        # GitHub Actions configs
+│       └── cicd.yaml                 # GitHub Actions configs
 ├── .env
 ├── .gitignore                   
 ├── .dockerignore
 ├── store.py                          # Used to create pinecone index
 └── README.md
+```
+
 
 
 
