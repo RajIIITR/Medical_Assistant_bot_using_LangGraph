@@ -175,6 +175,7 @@ This project uses GitHub Actions for automated testing and deployment.
    - `PINECONE_API_KEY`
    - `TAVILY_API_KEY`
    - `GEMINI_API_KEY`
+   - `ECR_REPO`
 
 4. **Triggering**
    - Automatically on `push` to `main`
