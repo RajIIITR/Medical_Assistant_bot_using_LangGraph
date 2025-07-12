@@ -179,4 +179,4 @@ This project uses GitHub Actions for automated testing and deployment.
 
 4. **Triggering**
    - Automatically on `push` to `main`
-   - Or manually via GitHub → Actions → Run workflow
+   - Or manually via GitHub → Actions → Run workflow a
