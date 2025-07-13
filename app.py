@@ -25,7 +25,6 @@ load_dotenv()
 # Environment variables setup
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
 LANGSMITH_PROJECT = "MedQuery_LangGraph"
@@ -33,7 +32,6 @@ LANGSMITH_PROJECT = "MedQuery_LangGraph"
 # Set environment variables
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 os.environ["TAVILY_API_KEY"] = TAVILY_API_KEY
-os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
 os.environ["LANGCHAIN_API_KEY"] = LANGCHAIN_API_KEY
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
