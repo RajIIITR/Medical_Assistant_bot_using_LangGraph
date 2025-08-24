@@ -1,8 +1,8 @@
-# 🧠 MedQueryAI: Advanced Medical Knowledge Assistant
+# MedQueryAI: Advanced Medical Knowledge Assistant
 
 MedQueryAI is a multi-modal medical AI system designed to deliver accurate and insightful responses to both text-based and image-based medical queries. By combining Retrieval-Augmented Generation (RAG), Hugging Face embeddings, Pinecone vector search, Tavily web search, and Google Gemini 2.5 Flash, MedQueryAI offers robust, context-aware responses for healthcare applications.
 
-## 🔧 Features
+## Features
 
 - Multi-modal support for text and image queries
 - RAG-based architecture with internal and external context retrieval
@@ -11,7 +11,7 @@ MedQueryAI is a multi-modal medical AI system designed to deliver accurate and i
 - Image understanding via a custom `Get_Image_Info` pipeline
 - Scalable deployment using FastAPI, Docker, and GitHub Actions
 
-## 🧠 How It Works
+## How It Works
 
 1. **Grading Phase**:
    - Text queries pass through `grade_question`
@@ -33,9 +33,9 @@ MedQueryAI is a multi-modal medical AI system designed to deliver accurate and i
    - A context-rich response is generated using Google Gemini 2.5 Flash
    - The response is returned via the `generate` node
 
-## 🧭 Workflow Diagrams
+## Workflow Diagrams
 
-### 🔤 Text-Only Query Pipeline
+### Text-Only Query Pipeline
 
 ```mermaid
 flowchart TD
@@ -49,7 +49,7 @@ flowchart TD
     F --> H([end])
 ```
 
-### 🖼️ Image + Text Query Pipeline
+### Image + Text Query Pipeline
 
 ```mermaid
 flowchart TD
@@ -67,7 +67,7 @@ flowchart TD
 
 
 
-## 📂 Project Structure
+## Project Structure
 
 ```plaintext
 MedQueryAI/
@@ -96,87 +96,11 @@ MedQueryAI/
 ```
 
 
-
-
-
-
-## 🚀 Deployment Guide
-
-### ✅ Local Development
-
-To run the project locally:
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/MedQueryAI.git
-   cd MedQueryAI
-   ```
-
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Set up environment variables**
-
-   Create a `.env` file in the root directory with the following:
-   ```env
-   PINECONE_API_KEY=your_pinecone_api_key
-   TAVILY_API_KEY=your_tavily_api_key
-   GEMINI_API_KEY=your_gemini_api_key
-   ```
-
-4. **Start the FastAPI server**
-   ```bash
+### **To RUn this code on your terminal**
    uvicorn app.main:app --reload
-   ```
 
-5. **Open in browser**
+
+### **Open in browser**
    - App URL: http://localhost:8080
 
----
-
-### 🐳 Docker Deployment
-
-1. **Build the Docker image**
-   ```bash
-   docker build -t medqueryai .
-   ```
-
-2. **Run the Docker container**
-   ```bash
-   docker run -p 8888:8080 abhishekraj07/medqueryai
-   ```
-
-> ✅ Ensure your `.env` file is present in the root directory before running the container.
-
----
-
-### ⚙️ CI/CD with GitHub Actions
-
-This project uses GitHub Actions for automated testing and deployment.
-
-1. **Workflow file**
-   ```
-   .github/workflows/cicd.yaml
-   ```
-
-2. **Pipeline includes:**
-   - Checkout source code
-   - Set up Python environment
-   - Install dependencies
-   - Build and push Docker image (if configured)
-   - Deploy to cloud (e.g., AWS EC2/ECS)
-
-3. **Secrets to set in GitHub**
-   Go to: **Repository > Settings > Secrets and variables > Actions**, and add:
-   - `AWS_ACCESS_KEY_ID`
-   - `AWS_SECRET_ACCESS_KEY`
-   - `PINECONE_API_KEY`
-   - `TAVILY_API_KEY`
-   - `GEMINI_API_KEY`
-   - `ECR_REPO`
-
-4. **Triggering**
-   - Automatically on `push` to `main`
-   - Or manually via GitHub → Actions → Run workflow 
+DO LIKE THIS REPO IF YOU FIND IT HELPFUL!!
